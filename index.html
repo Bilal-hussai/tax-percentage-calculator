@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Professional Percentage Calculator</title>
+
+<!-- INTER VARIABLE FONT (GOOGLE FONTS CDN) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,100..900&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#F3EDF2;
+  --card:#ffffff;
+  --text:#0f172a;
+  --accent:#fe6100;
+  --accent-hover:#e55800;
+  --green:#16a34a;
+  --red:#dc2626;
+  --shadow:0 8px 28px rgba(254,97,0,.18);
+}
+
+/* BASE */
+*{
+  box-sizing:border-box;
+  font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,
+  "Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* LAYOUT */
+.wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.card{
+  width:100%;
+  max-width:460px;
+  background:var(--card);
+  padding:22px;
+  border-radius:22px;
+  box-shadow:0 8px 34px rgba(15,23,42,.08);
+}
+
+/* TITLES */
+.title{
+  text-align:center;
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:-0.03em;
+}
+
+.subtitle{
+  text-align:center;
+  font-size:14px;
+  font-weight:500;
+  color:#475569;
+  margin-bottom:18px;
+}
+
+/* INPUTS */
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:14px;
+}
+
+label.small{
+  font-size:13px;
+  font-weight:700;
+  color:#334155;
+}
+
+input, select{
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid #e5e7eb;
+  font-size:17px;
+  font-weight:600;
+  color:#0f172a;
+  outline:none;
+}
+
+input::placeholder{
+  color:#94a3b8;
+  font-weight:500;
+}
+
+/* RESULT */
+.result{
+  background:#fafafa;
+  border:1px solid #e5e7eb;
+  padding:16px;
+  border-radius:16px;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:7px 0;
+}
+
+.label{
+  font-size:14px;
+  font-weight:600;
+  color:#334155;
+}
+
+.value{
+  font-size:17px;
+  font-weight:900;
+  min-width:110px;
+  text-align:right;
+  position:relative;
+  overflow:hidden;
+}
+
+.final{
+  font-size:20px;
+}
+
+/* ANIMATIONS */
+.roll-up{animation:rollUp .35s ease-out}
+.roll-down{animation:rollDown .35s ease-out}
+.green{color:var(--green)}
+.red{color:var(--red)}
+
+@keyframes rollUp{
+  from{transform:translateY(18px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+@keyframes rollDown{
+  from{transform:translateY(-18px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+/* BUTTONS */
+.btn{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:0;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.btn-primary{
+  background:var(--accent);
+  box-shadow:var(--shadow);
+}
+
+.btn-primary:hover{
+  background:var(--accent-hover);
+}
+
+.btn-ghost{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  margin-top:10px;
+  font-weight:800;
+}
+
+/* FOOTER */
+footer{
+  margin-top:12px;
+  text-align:center;
+  font-size:12px;
+  font-weight:600;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<main class="card">
+
+<h1 class="title">Percentage Calculator</h1>
+<p class="subtitle">Excel-style live calculation with smooth animation</p>
+
+<div class="field">
+<label class="small">Amount</label>
+<input id="amount" placeholder="Enter amount">
+</div>
+
+<div class="field">
+<label class="small">Percentage (%)</label>
+<input id="percentInput" placeholder="e.g. 0.25 or 5">
+</div>
+
+<div class="field">
+<label class="small">Display precision</label>
+<select id="precision">
+  <option value="2">2 decimals</option>
+  <option value="full">Full</option>
+  <option value="int">Integer</option>
+</select>
+</div>
+
+<div class="result">
+  <div class="row">
+    <div class="label">Original</div>
+    <div id="orig" class="value">0</div>
+  </div>
+  <div class="row">
+    <div class="label">Percentage value</div>
+    <div id="percentVal" class="value">0</div>
+  </div>
+  <div class="row">
+    <div class="label final">Final after subtract</div>
+    <div id="final" class="value final">0</div>
+  </div>
+</div>
+
+<button id="copyBtn" class="btn btn-primary">Copy results</button>
+<button id="resetBtn" class="btn btn-ghost">Reset</button>
+
+<footer>Press Enter to move to next field</footer>
+
+</main>
+</div>
+
+<script>
+const amountEl=document.getElementById('amount');
+const percentEl=document.getElementById('percentInput');
+const precisionEl=document.getElementById('precision');
+const origEl=document.getElementById('orig');
+const percentValEl=document.getElementById('percentVal');
+const finalEl=document.getElementById('final');
+const copyBtn=document.getElementById('copyBtn');
+
+let prev={o:0,p:0,f:0};
+
+function parseNum(v){
+  return Number(String(v).replace(/[^\d.-]/g,''))||0;
+}
+function format(n,p){
+  if(p==='full')return n.toString();
+  if(p==='int')return Math.round(n).toString();
+  return n.toFixed(2);
+}
+function animate(el,newVal,oldVal){
+  el.className='value';
+  if(newVal>oldVal)el.classList.add('green','roll-up');
+  else if(newVal<oldVal)el.classList.add('red','roll-down');
+  el.textContent=newVal;
+}
+
+function calc(){
+  const a=parseNum(amountEl.value);
+  const pc=parseNum(percentEl.value);
+  const pr=precisionEl.value;
+
+  const pv=a*pc/100;
+  const f=a-pv;
+
+  const o=format(a,pr), p=format(pv,pr), fn=format(f,pr);
+
+  animate(origEl,o,prev.o);
+  animate(percentValEl,p,prev.p);
+  animate(finalEl,fn,prev.f);
+
+  prev={o,p,f:fn};
+
+  copyBtn.dataset.txt=`Amount: ${o} | ${pc}% = ${p} | Final: ${fn}`;
+}
+
+[amountEl,percentEl,precisionEl].forEach(el=>{
+  el.addEventListener('input',calc);
+  el.addEventListener('change',calc);
+});
+
+/* ENTER FLOW */
+amountEl.onkeydown=e=>{if(e.key==='Enter')percentEl.focus()}
+percentEl.onkeydown=e=>{if(e.key==='Enter')precisionEl.focus()}
+precisionEl.onkeydown=e=>{if(e.key==='Enter')finalEl.scrollIntoView({behavior:'smooth'})}
+
+/* COPY */
+copyBtn.onclick=()=>{
+  navigator.clipboard.writeText(copyBtn.dataset.txt||'');
+  copyBtn.textContent='Copied ✓';
+  setTimeout(()=>copyBtn.textContent='Copy results',1200);
+}
+
+/* RESET */
+document.getElementById('resetBtn').onclick=()=>{
+  amountEl.value='';percentEl.value='';precisionEl.value='2';
+  prev={o:0,p:0,f:0};calc();
+}
+
+calc();
+</script>
+</body>
+</html>
